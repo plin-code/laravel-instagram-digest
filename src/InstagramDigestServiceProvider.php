@@ -7,6 +7,7 @@ namespace PlinCode\InstagramDigest;
 use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
 use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
+use PlinCode\InstagramDigest\Commands\ScrapeHashtagsCommand;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -20,7 +21,8 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->hasConfigFile('instagram-digest')
             ->hasTranslations()
             ->hasMigration('create_instagram_digest_profiles_table')
-            ->hasMigration('create_instagram_digest_runs_table');
+            ->hasMigration('create_instagram_digest_runs_table')
+            ->hasCommand(ScrapeHashtagsCommand::class);
     }
 
     public function packageRegistered(): void
