@@ -10,6 +10,7 @@ use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
 use PlinCode\InstagramDigest\Commands\ScrapeHashtagsCommand;
 use PlinCode\InstagramDigest\Commands\SendDigestCommand;
+use PlinCode\InstagramDigest\Commands\SetWebhookCommand;
 use PlinCode\InstagramDigest\Contracts\CardRenderer;
 use PlinCode\InstagramDigest\Rendering\DefaultCardRenderer;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
@@ -28,7 +29,8 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->hasMigration('create_instagram_digest_profiles_table')
             ->hasMigration('create_instagram_digest_runs_table')
             ->hasCommand(ScrapeHashtagsCommand::class)
-            ->hasCommand(SendDigestCommand::class);
+            ->hasCommand(SendDigestCommand::class)
+            ->hasCommand(SetWebhookCommand::class);
     }
 
     public function packageBooted(): void
