@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
 use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
+use PlinCode\InstagramDigest\Commands\DemoCommand;
 use PlinCode\InstagramDigest\Commands\ScrapeHashtagsCommand;
 use PlinCode\InstagramDigest\Commands\SendDigestCommand;
 use PlinCode\InstagramDigest\Commands\SetWebhookCommand;
@@ -30,7 +31,8 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->hasMigration('create_instagram_digest_runs_table')
             ->hasCommand(ScrapeHashtagsCommand::class)
             ->hasCommand(SendDigestCommand::class)
-            ->hasCommand(SetWebhookCommand::class);
+            ->hasCommand(SetWebhookCommand::class)
+            ->hasCommand(DemoCommand::class);
     }
 
     public function packageBooted(): void
