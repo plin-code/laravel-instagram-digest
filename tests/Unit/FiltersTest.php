@@ -27,3 +27,19 @@ it('passes everything when keyword list is empty', function () {
 
     expect($filter->passes(['biography' => 'anything', 'username' => 'any']))->toBeTrue();
 });
+
+use PlinCode\InstagramDigest\Services\Filters\MinFollowersFilter;
+
+it('MinFollowersFilter passes at threshold', function () {
+    $filter = new MinFollowersFilter(5000);
+
+    expect($filter->passes(['followers_count' => 5000]))->toBeTrue()
+        ->and($filter->passes(['followers_count' => 4999]))->toBeFalse()
+        ->and($filter->passes(['followers_count' => 100000]))->toBeTrue();
+});
+
+it('MinFollowersFilter treats missing followers_count as zero', function () {
+    $filter = new MinFollowersFilter(1);
+
+    expect($filter->passes([]))->toBeFalse();
+});
