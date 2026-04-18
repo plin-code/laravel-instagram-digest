@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static string version()
+ * @method static \PlinCode\InstagramDigest\Support\ActionRegistry registry()
+ * @method static \PlinCode\InstagramDigest\InstagramDigest registerAction(string $key, string $label, \Closure $handler)
+ * @method static \PlinCode\InstagramDigest\InstagramDigest defaultActions(array $actions)
  * @method static \PlinCode\InstagramDigest\InstagramDigest hashtagsUsing(\Closure $resolver)
  * @method static \PlinCode\InstagramDigest\InstagramDigest keywordsUsing(\Closure $resolver)
  * @method static \PlinCode\InstagramDigest\InstagramDigest minFollowersUsing(\Closure $resolver)

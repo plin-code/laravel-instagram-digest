@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace PlinCode\InstagramDigest;
 
 use Closure;
+use PlinCode\InstagramDigest\Contracts\DigestAction;
+use PlinCode\InstagramDigest\Models\Profile;
+use PlinCode\InstagramDigest\Support\ActionRegistry;
 
 class InstagramDigest
 {
@@ -18,9 +21,55 @@ class InstagramDigest
 
     private ?Closure $dailyCountResolver = null;
 
+    public function __construct(private readonly ActionRegistry $registry) {}
+
     public function version(): string
     {
         return '1.0.0';
+    }
+
+    public function registry(): ActionRegistry
+    {
+        return $this->registry;
+    }
+
+    public function registerAction(string $key, string $label, Closure $handler): self
+    {
+        $this->registry->register(new class($key, $label, $handler) implements DigestAction
+        {
+            public function __construct(
+                private readonly string $key,
+                private readonly string $label,
+                private readonly Closure $handler,
+            ) {}
+
+            public function key(): string
+            {
+                return $this->key;
+            }
+
+            public function label(): string
+            {
+                return $this->label;
+            }
+
+            public function handle(Profile $p): void
+            {
+                ($this->handler)($p);
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param  array<DigestAction>  $actions
+     */
+    public function defaultActions(array $actions): self
+    {
+        $this->registry->replaceAll($actions);
+
+        return $this;
     }
 
     public function hashtagsUsing(Closure $resolver): self
