@@ -8,6 +8,7 @@ use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
 use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
 use PlinCode\InstagramDigest\Commands\ScrapeHashtagsCommand;
+use PlinCode\InstagramDigest\Commands\SendDigestCommand;
 use PlinCode\InstagramDigest\Contracts\CardRenderer;
 use PlinCode\InstagramDigest\Rendering\DefaultCardRenderer;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
@@ -25,7 +26,8 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasMigration('create_instagram_digest_profiles_table')
             ->hasMigration('create_instagram_digest_runs_table')
-            ->hasCommand(ScrapeHashtagsCommand::class);
+            ->hasCommand(ScrapeHashtagsCommand::class)
+            ->hasCommand(SendDigestCommand::class);
     }
 
     public function packageRegistered(): void
