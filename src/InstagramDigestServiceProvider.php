@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PlinCode\InstagramDigest;
 
+use Illuminate\Support\Facades\Route;
 use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
 use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
@@ -28,6 +29,19 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->hasMigration('create_instagram_digest_runs_table')
             ->hasCommand(ScrapeHashtagsCommand::class)
             ->hasCommand(SendDigestCommand::class);
+    }
+
+    public function packageBooted(): void
+    {
+        $this->registerRoutes();
+    }
+
+    private function registerRoutes(): void
+    {
+        Route::group([
+            'prefix' => (string) config('instagram-digest.route.prefix', 'instagram-digest').'/webhook',
+            'middleware' => (array) config('instagram-digest.route.middleware', ['api']),
+        ], fn () => $this->loadRoutesFrom(__DIR__.'/../routes/webhook.php'));
     }
 
     public function packageRegistered(): void
