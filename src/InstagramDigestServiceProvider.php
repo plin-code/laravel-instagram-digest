@@ -8,6 +8,8 @@ use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
 use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Actions\ReproposeAction;
 use PlinCode\InstagramDigest\Commands\ScrapeHashtagsCommand;
+use PlinCode\InstagramDigest\Contracts\CardRenderer;
+use PlinCode\InstagramDigest\Rendering\DefaultCardRenderer;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -20,6 +22,7 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
             ->name('laravel-instagram-digest')
             ->hasConfigFile('instagram-digest')
             ->hasTranslations()
+            ->hasViews()
             ->hasMigration('create_instagram_digest_profiles_table')
             ->hasMigration('create_instagram_digest_runs_table')
             ->hasCommand(ScrapeHashtagsCommand::class);
@@ -27,6 +30,11 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
+        $this->app->bind(
+            CardRenderer::class,
+            DefaultCardRenderer::class,
+        );
+
         $this->app->singleton(ActionRegistry::class, function () {
             $registry = new ActionRegistry;
             $registry->register(new MarkAsInteresting);

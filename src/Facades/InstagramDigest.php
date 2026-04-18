@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static int resolveMinFollowers()
  * @method static string resolveChatId()
  * @method static int resolveDailyCount()
+ * @method static \PlinCode\InstagramDigest\InstagramDigest renderCardUsing(string $rendererClass)
  *
  * @see \PlinCode\InstagramDigest\InstagramDigest
  */

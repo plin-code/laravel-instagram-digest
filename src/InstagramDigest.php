@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PlinCode\InstagramDigest;
 
 use Closure;
+use PlinCode\InstagramDigest\Contracts\CardRenderer;
 use PlinCode\InstagramDigest\Contracts\DigestAction;
 use PlinCode\InstagramDigest\Models\Profile;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
@@ -103,6 +104,13 @@ class InstagramDigest
     public function dailyCountUsing(Closure $resolver): self
     {
         $this->dailyCountResolver = $resolver;
+
+        return $this;
+    }
+
+    public function renderCardUsing(string $rendererClass): self
+    {
+        app()->bind(CardRenderer::class, $rendererClass);
 
         return $this;
     }
