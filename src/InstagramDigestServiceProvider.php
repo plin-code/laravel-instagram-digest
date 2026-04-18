@@ -14,6 +14,7 @@ class InstagramDigestServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-instagram-digest')
             ->hasConfigFile('instagram-digest')
-            ->hasMigration('create_instagram_digest_profiles_table');
+            ->hasMigration('create_instagram_digest_profiles_table')
+            ->hasMigration('create_instagram_digest_runs_table');
     }
 }
