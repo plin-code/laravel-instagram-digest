@@ -46,3 +46,23 @@ it('does not re-send profiles that already have telegram_message_id', function (
     expect(Profile::where('instagram_username', 'a')->first()->telegram_message_id)->toBe('99')
         ->and(Profile::where('instagram_username', 'b')->first()->telegram_message_id)->not->toBeNull();
 });
+
+it('logs and continues when a single sendPhoto call fails', function () {
+    // First profile gets a 500 (no retry since it's not 429); second succeeds.
+    Http::fake([
+        'api.telegram.org/*' => Http::sequence()
+            ->push(['error' => 'internal'], 500)
+            ->push(['ok' => true, 'result' => ['message_id' => 200]], 200),
+    ]);
+
+    $a = Profile::create(['instagram_username' => 'bad',  'followers_count' => 1, 'profile_pic_url' => 'https://x/y.jpg']);
+    $b = Profile::create(['instagram_username' => 'good', 'followers_count' => 1, 'profile_pic_url' => 'https://x/z.jpg']);
+
+    dispatch_sync(new SendDigestJob);
+
+    $bad = Profile::where('instagram_username', 'bad')->first();
+    $good = Profile::where('instagram_username', 'good')->first();
+
+    expect($bad->telegram_message_id)->toBeNull()
+        ->and($good->telegram_message_id)->not->toBeNull();
+});
