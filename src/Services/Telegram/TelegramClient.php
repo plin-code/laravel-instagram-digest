@@ -42,7 +42,7 @@ class TelegramClient
             ->post("https://api.telegram.org/bot{$this->token}/{$endpoint}", $body);
 
         if ($response->status() === 429) {
-            $retryAfter = (int) $response->header('Retry-After', '1');
+            $retryAfter = (int) ($response->header('Retry-After') ?: '1');
             sleep(max(1, $retryAfter));
             $response = Http::timeout(15)->post("https://api.telegram.org/bot{$this->token}/{$endpoint}", $body);
         }

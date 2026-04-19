@@ -25,9 +25,7 @@ class ActionRegistry
     {
         $this->actions = [];
         foreach ($actions as $action) {
-            if ($action instanceof DigestAction) {
-                $this->register($action);
-            }
+            $this->register($action);
         }
 
         return $this;

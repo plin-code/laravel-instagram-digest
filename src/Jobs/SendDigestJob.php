@@ -41,6 +41,7 @@ class SendDigestJob implements ShouldQueue
             ->limit($count)
             ->get();
 
+        /** @var array<string> $sentIds */
         $sentIds = [];
 
         foreach ($profiles as $profile) {
