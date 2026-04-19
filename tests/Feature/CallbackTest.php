@@ -48,3 +48,41 @@ it('200 OK (no-op) on unknown action key', function () {
 
     expect($profile->fresh()->status)->toBe('pending');
 });
+
+it('accepts callback with secret in X-Telegram-Bot-Api-Secret-Token header', function () {
+    Event::fake([ProfileStatusChanged::class]);
+
+    $profile = Profile::create(['instagram_username' => 'hdr', 'followers_count' => 1]);
+
+    // POST to the path WITHOUT a secret segment; secret travels in the header.
+    $this->withHeaders(['X-Telegram-Bot-Api-Secret-Token' => 'SECRET'])
+        ->postJson('/instagram-digest/webhook', [
+            'callback_query' => [
+                'id' => 'CBH',
+                'data' => 'interesting:'.$profile->id,
+                'message' => ['chat' => ['id' => '1'], 'message_id' => 1],
+            ],
+        ])->assertOk();
+
+    expect($profile->fresh()->status)->toBe('interesting');
+});
+
+it('calls clearReplyMarkup with the originating chat_id and message_id', function () {
+    $profile = Profile::create(['instagram_username' => 'clr', 'followers_count' => 1]);
+
+    $this->postJson('/instagram-digest/webhook/SECRET', [
+        'callback_query' => [
+            'id' => 'CB',
+            'data' => 'interesting:'.$profile->id,
+            'message' => ['chat' => ['id' => 'CHAT_42'], 'message_id' => 909],
+        ],
+    ])->assertOk();
+
+    Http::assertSent(function ($r) {
+        $data = $r->data();
+
+        return str_contains($r->url(), '/editMessageReplyMarkup')
+            && ($data['chat_id'] ?? null) === 'CHAT_42'
+            && ((int) ($data['message_id'] ?? 0)) === 909;
+    });
+});
