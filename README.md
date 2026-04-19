@@ -61,6 +61,14 @@ Verify your Telegram setup end-to-end:
 php artisan instagram-digest:demo
 ```
 
+The demo uses a `placehold.co` URL for the placeholder image, so Telegram must be able to fetch that URL. If your network or bot configuration blocks external image fetches, pass a photo URL explicitly:
+
+```bash
+php artisan instagram-digest:demo --to=CHAT_ID
+```
+
+(Note: the `--to` option overrides the configured `chat_id` but currently uses the same placeholder image. For a full dry-run with your own image, register a custom `CardRenderer` — see below.)
+
 ## Data sources: resolvers vs config
 
 Every data source has two equivalent ways to supply it.
@@ -116,7 +124,7 @@ Any class implementing `PlinCode\InstagramDigest\Contracts\DigestAction` is acce
 **Option A: publish the Blade view and edit it**
 
 ```bash
-php artisan vendor:publish --tag=laravel-instagram-digest-views
+php artisan vendor:publish --tag=instagram-digest-views
 ```
 
 Then edit `resources/views/vendor/instagram-digest/card.blade.php`.
@@ -131,6 +139,25 @@ InstagramDigest::renderCardUsing(MyCardRenderer::class);
 ```
 
 Your renderer must return a `PlinCode\InstagramDigest\Support\CardPayload`.
+
+## Customizing the webhook route
+
+The webhook is registered by the package at `POST /instagram-digest/webhook/{secret?}` with the `api` middleware group. Both the URL prefix and the middleware stack are config-driven — edit `config/instagram-digest.php` after publishing:
+
+```bash
+php artisan vendor:publish --tag=instagram-digest-config
+```
+
+Then adjust:
+
+```php
+'route' => [
+    'prefix' => 'instagram-digest',           // appears in the URL: /{prefix}/webhook/{secret?}
+    'middleware' => ['api'],                  // any middleware array — e.g. ['api', 'throttle:60,1']
+],
+```
+
+If you need full control (different HTTP verb, route model binding, custom controller), you can bypass the auto-registered route by setting `'middleware' => ['api', 'should-never-match']` (breaks the route) and defining your own pointing at `PlinCode\InstagramDigest\Http\Controllers\WebhookController`.
 
 ## Scheduling
 
@@ -149,7 +176,7 @@ Listen to the following events to integrate with your own domain:
 
 | Event | Payload | Use case |
 |---|---|---|
-| `ProfileDiscovered` | `Profile $profile, bool $isNew` | Sync to your CRM/lead model |
+| `ProfileDiscovered` | `Profile $profile, bool $isNew` | Sync to your CRM / lead model — `$isNew` distinguishes first-time discovery from refresh |
 | `ProfileStatusChanged` | `Profile $profile, string $from, string $to` | React to user classification |
 | `DigestSent` | `array $profileIds` | Metrics, auditing |
 | `ScrapingRunCompleted` | `Run $run` | Notifications |
@@ -159,12 +186,40 @@ Example listener:
 ```php
 public function handle(ProfileDiscovered $event): void
 {
+    if (! $event->isNew) {
+        return;
+    }
+
     Prospect::firstOrCreate(
         ['instagram_handle' => $event->profile->instagram_username],
         ['status' => 'new'],
     );
 }
 ```
+
+## Testing your integration
+
+The package plays nicely with Laravel's HTTP fakes and event fakes. In your own tests:
+
+```php
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Event;
+use PlinCode\InstagramDigest\Events\ProfileDiscovered;
+use PlinCode\InstagramDigest\Jobs\RunHashtagScrapingJob;
+
+it('my app reacts to ProfileDiscovered', function () {
+    Event::fake([ProfileDiscovered::class]);
+    Http::fake([
+        'api.apify.com/*' => Http::response([/* ... */], 200),
+    ]);
+
+    dispatch_sync(new RunHashtagScrapingJob);
+
+    Event::assertDispatched(ProfileDiscovered::class);
+});
+```
+
+For the Telegram side, fake `api.telegram.org/*` and assert via `Http::assertSent(...)`.
 
 ## Commands
 
