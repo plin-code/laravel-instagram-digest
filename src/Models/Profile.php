@@ -16,11 +16,13 @@ use Illuminate\Support\Carbon;
  * @property string|null $full_name
  * @property string|null $biography
  * @property string|null $profile_pic_url
+ * @property string|null $external_url
  * @property int $followers_count
  * @property int $following_count
  * @property bool $is_verified
  * @property string $status
- * @property int|null $telegram_message_id
+ * @property string|null $source_hashtag
+ * @property string|null $telegram_message_id
  * @property array<string, mixed>|null $metadata
  * @property Carbon|null $reviewed_at
  * @property Carbon|null $created_at
