@@ -39,3 +39,23 @@ it('throws on FAILED terminal status', function () {
     $client = new ApifyClient;
     $client->runAndFetch(['trekking'], resultsLimit: 10);
 })->throws(RuntimeException::class, 'Apify run failed');
+
+it('throws on ABORTED terminal status', function () {
+    Http::fake([
+        'api.apify.com/v2/acts/*/runs*' => Http::response(['data' => ['id' => 'RA']], 201),
+        'api.apify.com/v2/actor-runs/RA' => Http::response(['data' => ['status' => 'ABORTED']], 200),
+    ]);
+
+    $client = new ApifyClient;
+    $client->runAndFetch(['trekking'], resultsLimit: 1);
+})->throws(RuntimeException::class, 'Apify run failed');
+
+it('throws on TIMED-OUT terminal status', function () {
+    Http::fake([
+        'api.apify.com/v2/acts/*/runs*' => Http::response(['data' => ['id' => 'RT']], 201),
+        'api.apify.com/v2/actor-runs/RT' => Http::response(['data' => ['status' => 'TIMED-OUT']], 200),
+    ]);
+
+    $client = new ApifyClient;
+    $client->runAndFetch(['trekking'], resultsLimit: 1);
+})->throws(RuntimeException::class, 'Apify run failed');
