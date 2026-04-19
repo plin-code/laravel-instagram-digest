@@ -64,9 +64,10 @@ class WebhookController extends Controller
 
             $from = (string) $profile->status;
             $action->handle($profile);
-            $to = (string) $profile->fresh()->status;
+            $fresh = $profile->fresh();
+            $to = (string) $fresh->status;
 
-            ProfileStatusChanged::dispatch($profile->fresh(), $from, $to);
+            ProfileStatusChanged::dispatch($fresh, $from, $to);
 
             $callbackId = (string) ($callback['id'] ?? '');
             if ($callbackId !== '') {
