@@ -16,6 +16,7 @@ it('sends a fake card to the configured chat id', function () {
 
     Http::assertSent(function ($r) {
         $data = $r->data();
+
         return str_contains($r->url(), '/botBOT/send') && ($data['chat_id'] ?? null) === 'CHAT';
     });
 });
@@ -27,6 +28,7 @@ it('honors --to override', function () {
 
     Http::assertSent(function ($r) {
         $data = $r->data();
+
         return ($data['chat_id'] ?? null) === 'OTHER';
     });
 });

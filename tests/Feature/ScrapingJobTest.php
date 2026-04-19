@@ -48,7 +48,7 @@ it('marks the run failed if the scraper throws', function () {
 
     try {
         dispatch_sync(new RunHashtagScrapingJob);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         // expected
     }
 

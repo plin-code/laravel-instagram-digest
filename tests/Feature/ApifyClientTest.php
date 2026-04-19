@@ -38,4 +38,4 @@ it('throws on FAILED terminal status', function () {
 
     $client = new ApifyClient;
     $client->runAndFetch(['trekking'], resultsLimit: 10);
-})->throws(\RuntimeException::class, 'Apify run failed');
+})->throws(RuntimeException::class, 'Apify run failed');

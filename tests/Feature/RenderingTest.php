@@ -7,6 +7,7 @@ use PlinCode\InstagramDigest\Actions\MarkAsRejected;
 use PlinCode\InstagramDigest\Contracts\CardRenderer;
 use PlinCode\InstagramDigest\Facades\InstagramDigest;
 use PlinCode\InstagramDigest\Models\Profile;
+use PlinCode\InstagramDigest\Rendering\DefaultCardRenderer;
 use PlinCode\InstagramDigest\Support\CardPayload;
 
 it('renders a default card with caption, photo and action buttons', function () {
@@ -46,7 +47,7 @@ it('respects renderCardUsing override via direct bind', function () {
 });
 
 it('renderCardUsing(ClassName::class) rebinds the CardRenderer contract', function () {
-    InstagramDigest::renderCardUsing(\PlinCode\InstagramDigest\Rendering\DefaultCardRenderer::class);
+    InstagramDigest::renderCardUsing(DefaultCardRenderer::class);
 
-    expect(app(CardRenderer::class))->toBeInstanceOf(\PlinCode\InstagramDigest\Rendering\DefaultCardRenderer::class);
+    expect(app(CardRenderer::class))->toBeInstanceOf(DefaultCardRenderer::class);
 });

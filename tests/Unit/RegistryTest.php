@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use PlinCode\InstagramDigest\Actions\MarkAsInteresting;
+use PlinCode\InstagramDigest\Contracts\DigestAction;
 use PlinCode\InstagramDigest\Facades\InstagramDigest;
 use PlinCode\InstagramDigest\Models\Profile;
 use PlinCode\InstagramDigest\Support\ActionRegistry;
@@ -40,11 +41,19 @@ it('can register a custom action via closure', function () {
 
 it('can replace default actions with defaultActions()', function () {
     InstagramDigest::defaultActions([
-        new class implements \PlinCode\InstagramDigest\Contracts\DigestAction
+        new class implements DigestAction
         {
-            public function key(): string { return 'yes'; }
-            public function label(): string { return 'Yes'; }
-            public function handle(\PlinCode\InstagramDigest\Models\Profile $p): void
+            public function key(): string
+            {
+                return 'yes';
+            }
+
+            public function label(): string
+            {
+                return 'Yes';
+            }
+
+            public function handle(Profile $p): void
             {
                 $p->update(['status' => 'yes']);
             }
