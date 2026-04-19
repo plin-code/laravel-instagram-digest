@@ -108,9 +108,12 @@ class InstagramDigest
         return $this;
     }
 
-    public function renderCardUsing(string $rendererClass): self
+    public function renderCardUsing(Closure|string $renderer): self
     {
-        app()->bind(CardRenderer::class, $rendererClass);
+        app()->bind(
+            CardRenderer::class,
+            $renderer instanceof Closure ? $renderer : fn () => app($renderer),
+        );
 
         return $this;
     }
