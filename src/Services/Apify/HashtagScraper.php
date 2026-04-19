@@ -9,6 +9,17 @@ use PlinCode\InstagramDigest\Models\Profile;
 use PlinCode\InstagramDigest\Services\Filters\KeywordFilter;
 use PlinCode\InstagramDigest\Services\Filters\MinFollowersFilter;
 
+/**
+ * @phpstan-type RawApifyProfile array{
+ *     ownerUsername?: string|null,
+ *     ownerFullName?: string|null,
+ *     ownerBio?: string|null,
+ *     ownerFollowersCount?: int|null,
+ *     ownerProfilePicUrl?: string|null,
+ *     ownerIsVerified?: bool|null,
+ *     ownerId?: string|int|null,
+ * }
+ */
 class HashtagScraper
 {
     public function __construct(private readonly ApifyClient $client) {}
@@ -58,6 +69,7 @@ class HashtagScraper
                     continue;
                 }
 
+                // Per-profile lookup; acceptable for typical volumes (dozens per run). Batch via whereIn if volumes grow.
                 $existing = Profile::where('instagram_username', $normalized['instagram_username'])->first();
 
                 if ($existing === null) {
@@ -79,8 +91,8 @@ class HashtagScraper
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $items
-     * @return array<int, array<string, mixed>>
+     * @param  array<int, RawApifyProfile>  $items
+     * @return array<int, RawApifyProfile>
      */
     private function dedupeByUsername(array $items): array
     {
