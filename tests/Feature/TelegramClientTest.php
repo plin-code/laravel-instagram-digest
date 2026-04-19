@@ -44,3 +44,37 @@ it('editMessageReplyMarkup clears the inline keyboard', function () {
         return str_contains($request->url(), '/editMessageReplyMarkup');
     });
 });
+
+it('retries once after 429 respecting Retry-After', function () {
+    config()->set('instagram-digest.telegram.bot_token', 'BOT');
+
+    Http::fake([
+        'api.telegram.org/*' => Http::sequence()
+            ->push(['description' => 'Too Many Requests'], 429, ['Retry-After' => '1'])
+            ->push(['ok' => true, 'result' => ['message_id' => 777]], 200),
+    ]);
+
+    $client = new TelegramClient;
+    $id = $client->sendPhoto('CHAT', new CardPayload('hi', 'https://x/y.jpg', []));
+
+    expect($id)->toBe('777');
+});
+
+it('falls back to sendMessage when photoUrl is null', function () {
+    config()->set('instagram-digest.telegram.bot_token', 'BOT');
+    Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 55]], 200)]);
+
+    $client = new TelegramClient;
+    $id = $client->sendPhoto('CHAT', new CardPayload(
+        caption: 'text only',
+        photoUrl: null,
+        buttons: [],
+    ));
+
+    expect($id)->toBe('55');
+
+    Http::assertSent(function ($r) {
+        return str_contains($r->url(), '/sendMessage')
+            && ($r->data()['text'] ?? null) === 'text only';
+    });
+});
