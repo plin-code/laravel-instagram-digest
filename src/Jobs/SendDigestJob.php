@@ -25,6 +25,16 @@ class SendDigestJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $timeout = 300;
+
+    public int $tries = 2;
+
+    /** @return array<int> */
+    public function backoff(): array
+    {
+        return [30, 60];
+    }
+
     public function __construct(public readonly ?int $countOverride = null) {}
 
     public function handle(
