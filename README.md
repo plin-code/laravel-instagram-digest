@@ -1,6 +1,9 @@
 # laravel-instagram-digest
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/plin-code/laravel-instagram-digest.svg?style=flat-square)](https://packagist.org/packages/plin-code/laravel-instagram-digest)
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/plin-code/laravel-instagram-digest.svg?style=flat-square)](https://packagist.org/packages/plin-code/laravel-instagram-digest)
+[![Laravel versions](https://badge.laravel.cloud/badge/plin-code/laravel-instagram-digest?style=flat)](https://packagist.org/packages/plin-code/laravel-instagram-digest)
+[![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/plin-code/laravel-instagram-digest/run-tests.yml?branch=main&label=Tests&style=flat-square)](https://github.com/plin-code/laravel-instagram-digest/actions)
 [![Total Downloads](https://img.shields.io/packagist/dt/plin-code/laravel-instagram-digest.svg?style=flat-square)](https://packagist.org/packages/plin-code/laravel-instagram-digest)
 
 Scrape Instagram hashtags via Apify, filter profiles by keywords and follower threshold, and send a daily Telegram digest with inline action buttons. Classify candidates with one tap.
